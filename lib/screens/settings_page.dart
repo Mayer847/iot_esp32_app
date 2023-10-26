@@ -167,7 +167,8 @@ class _SettingsPageState extends State<SettingsPage> {
                 null; // reset the status while waiting for confirmation
             bool isUnsubscribed = false; // add this flag
 
-            Timer(Duration(seconds: 3), () {
+            Timer(Duration(seconds: 3), () async {
+              // make the callback async
               try {
                 if (!mounted) return; // Check if the widget is still mounted
                 if (status.value == null) {
@@ -178,9 +179,12 @@ class _SettingsPageState extends State<SettingsPage> {
                     mqttService.client.connectionStatus!.state ==
                         MqttConnectionState.connected) {
                   // only unsubscribe if not already done and client is connected
-                  // mqttService.unsubscribe("confirmation");
+                  mqttService.unsubscribe("confirmation");
                   isUnsubscribed = true;
                 }
+                // Reconnect to the MQTT client
+                await mqttService.connect(
+                    "test.mosquitto.org"); // replace "your_broker" with your actual broker
               } catch (e) {
                 print('Exception in timer callback: $e');
               }
