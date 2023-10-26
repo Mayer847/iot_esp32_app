@@ -4,12 +4,15 @@ import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
 import 'database_service.dart';
 import 'notification_service.dart';
+import 'dart:async';
 
 class MqttService with ChangeNotifier {
   late MqttServerClient client;
   double temperature = 0.0;
   double humidity = 0.0;
   ValueNotifier<bool> isConnected = ValueNotifier<bool>(false);
+
+  StreamController<String>? _updatesController;
 
   final alarmService = AlarmService();
   final notificationService = NotificationService();
@@ -35,6 +38,24 @@ class MqttService with ChangeNotifier {
     humidityLowerBound =
         ValueNotifier<double>(await alarmService.getHumidityLowerBound());
     notifyListeners();
+  }
+
+  Stream<String> get updates {
+    _updatesController ??= StreamController<String>.broadcast();
+    return _updatesController!.stream;
+  }
+
+  void unsubscribe(String topic) {
+    if (client.connectionStatus!.state == MqttConnectionState.connected) {
+      try {
+        client.unsubscribe(topic);
+      } catch (e) {
+        print('Error unsubscribing from $topic: $e');
+      }
+    } else {
+      print(
+          'Cannot unsubscribe from topic because MQTT client is not connected');
+    }
   }
 
   Future<void> connect(String broker) async {
@@ -67,6 +88,8 @@ class MqttService with ChangeNotifier {
         final MqttPublishMessage recMess = c?[0]?.payload as MqttPublishMessage;
         final payload = recMess.payload.message;
         final String pt = MqttPublishPayload.bytesToStringAsString(payload);
+
+        _updatesController?.add(pt); // add the message to the updates stream
 
         print('Received message:$pt from topic: ${c?[0]?.topic ?? ''}>');
 
@@ -111,8 +134,12 @@ class MqttService with ChangeNotifier {
   }
 
   void subscribe(String topic) {
-    const qos = MqttQos.atLeastOnce;
-    client.subscribe(topic, qos);
+    if (client.connectionStatus!.state == MqttConnectionState.connected) {
+      const qos = MqttQos.atLeastOnce;
+      client.subscribe(topic, qos);
+    } else {
+      print('Cannot subscribe to topic because MQTT client is not connected');
+    }
   }
 
   void subscribeToNewTopics() {
@@ -138,10 +165,20 @@ class MqttService with ChangeNotifier {
   }
 
   void publishThreshold(int thresholdType, double value) {
-    final builder = MqttClientPayloadBuilder();
-    builder.addString('$thresholdType:${value.toStringAsFixed(2)}');
+    if (client.connectionStatus!.state == MqttConnectionState.connected) {
+      final builder = MqttClientPayloadBuilder();
+      builder.addString('$thresholdType:$value');
+      print('Publishing message $thresholdType:$value to topic set_threshold');
+      client.publishMessage(
+          'set_threshold', MqttQos.exactlyOnce, builder.payload!);
+    } else {
+      print('Cannot publish message because MQTT client is not connected');
+    }
+  }
 
-    client.publishMessage(
-        'set_threshold', MqttQos.atLeastOnce, builder.payload!);
+  @override
+  void dispose() {
+    _updatesController?.close();
+    super.dispose();
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:iot_esp32_app/services/mqtt_service.dart';
 import 'package:iot_esp32_app/widgets/foreground_toggle.dart';
@@ -40,6 +42,7 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     final alarmService = Provider.of<AlarmService>(context);
+    final mqttService = Provider.of<MqttService>(context, listen: false);
 
     return Scaffold(
       appBar: AppBar(
@@ -154,7 +157,35 @@ class _SettingsPageState extends State<SettingsPage> {
           },
         ),
         ElevatedButton(
-          onPressed: () => onSave(),
+          onPressed: () async {
+            onSave();
+            final mqttService =
+                Provider.of<MqttService>(context, listen: false);
+            mqttService.subscribe("confirmation");
+            status.value =
+                null; // reset the status while waiting for confirmation
+            Timer(Duration(seconds: 3), () {
+              if (!mounted) return; // Check if the widget is still mounted
+              if (status.value == null) {
+                // if status is still null after 3 seconds, set it to false
+                status.value = false;
+              }
+              // mqttService.unsubscribe(
+              //     "confirmation"); // unsubscribe from the topic after 3 seconds
+            });
+            // StreamSubscription? subscription;
+            // subscription =
+            mqttService.updates.listen((message) {
+              if (!mounted) return; // Check if the widget is still mounted
+              if (message == "value changed!") {
+                status.value = true;
+                // subscription
+                //     ?.cancel(); // cancel the subscription after receiving the message
+                // mqttService.unsubscribe(
+                //     "confirmation"); // unsubscribe from the topic immediately after receiving the message
+              }
+            });
+          },
           child: Text('Save'),
         ),
       ],
