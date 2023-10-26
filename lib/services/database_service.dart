@@ -10,7 +10,7 @@ class DatabaseService {
   // Define the ValueNotifier
   //final ValueNotifier<bool> dataUpdatedNotifier = ValueNotifier(false);
   static final DatabaseService instance = DatabaseService._init();
-  final String tableIotNotify = 'iot_notify';
+  final String tableIotNotify = 'iot_esp32_app';
 
   static Database? _database;
 
@@ -30,7 +30,7 @@ class DatabaseService {
   Future<Database> get database async {
     if (_database != null) return _database!;
 
-    _database = await _initDB('iot_notify_db.db');
+    _database = await _initDB('iot_esp32_app_db.db');
     return _database!;
   }
 
@@ -111,7 +111,7 @@ CREATE TABLE $tableIotNotify (
 
       String path = downloadsDirectory!.path;
       // Include the timestamp in the file name
-      String fileName = 'iot_notify_data_$formattedDate.xlsx';
+      String fileName = 'iot_esp32_app_data_$formattedDate.xlsx';
 
       print('File path: $path/$fileName');
 

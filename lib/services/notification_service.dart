@@ -14,7 +14,7 @@ class NotificationService {
   Future<void> sendNotification(
       {required String title, required String body}) async {
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails('iot_Notify', 'iot_Notify',
+        AndroidNotificationDetails('iot_esp32_app', 'iot_esp32_app',
             importance: Importance.max,
             priority: Priority.high,
             showWhen: false,

@@ -7,7 +7,7 @@
 
     <application
 
-        android:label="iot_notify"
+        android:label="iot_esp32_app"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

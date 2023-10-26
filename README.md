@@ -1,4 +1,4 @@
-# iot_notify
+# iot_esp32_app
 
 A new Flutter project.
 

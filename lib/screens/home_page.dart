@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:iot_notify/screens/database_page.dart';
-import 'package:iot_notify/screens/settings_page.dart';
-import 'package:iot_notify/widgets/realtime_chart.dart';
+import 'package:iot_esp32_app/screens/database_page.dart';
+import 'package:iot_esp32_app/screens/settings_page.dart';
+import 'package:iot_esp32_app/widgets/realtime_chart.dart';
 import 'package:provider/provider.dart';
-import 'package:iot_notify/services/mqtt_service.dart';
+import 'package:iot_esp32_app/services/mqtt_service.dart';
 import 'dart:collection';
 
 class HomePage extends StatefulWidget {

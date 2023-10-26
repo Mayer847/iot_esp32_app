@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:iot_notify/services/alarm_service.dart';
+import 'package:iot_esp32_app/services/alarm_service.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
 import 'database_service.dart';

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:iot_notify/services/mqtt_service.dart';
-import 'package:iot_notify/widgets/foreground_toggle.dart';
+import 'package:iot_esp32_app/services/mqtt_service.dart';
+import 'package:iot_esp32_app/widgets/foreground_toggle.dart';
 import 'package:provider/provider.dart';
-import 'package:iot_notify/services/alarm_service.dart';
+import 'package:iot_esp32_app/services/alarm_service.dart';
 
 class SettingsPage extends StatefulWidget {
   @override

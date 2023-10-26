@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:iot_notify/services/database_service.dart';
+import 'package:iot_esp32_app/services/database_service.dart';
 
 class DatabasePage extends StatefulWidget {
   @override

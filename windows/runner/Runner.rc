@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "iot_notify" "\0"
+            VALUE "FileDescription", "iot_esp32_app" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "iot_notify" "\0"
+            VALUE "InternalName", "iot_esp32_app" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2023 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "iot_notify.exe" "\0"
-            VALUE "ProductName", "iot_notify" "\0"
+            VALUE "OriginalFilename", "iot_esp32_app.exe" "\0"
+            VALUE "ProductName", "iot_esp32_app" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
