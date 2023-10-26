@@ -136,4 +136,12 @@ class MqttService with ChangeNotifier {
     humidityUpperBound?.value = await alarmService.getHumidityUpperBound();
     humidityLowerBound?.value = await alarmService.getHumidityLowerBound();
   }
+
+  void publishThreshold(int thresholdType, double value) {
+    final builder = MqttClientPayloadBuilder();
+    builder.addString('$thresholdType:${value.toStringAsFixed(2)}');
+
+    client.publishMessage(
+        'set_threshold', MqttQos.atLeastOnce, builder.payload!);
+  }
 }

@@ -15,6 +15,12 @@ class _SettingsPageState extends State<SettingsPage> {
   final TextEditingController _humidUpperController = TextEditingController();
   final TextEditingController _humidLowerController = TextEditingController();
 
+  // ValueNotifiers for the check mark
+  final tempUpperStatus = ValueNotifier<bool?>(null);
+  final tempLowerStatus = ValueNotifier<bool?>(null);
+  final humidUpperStatus = ValueNotifier<bool?>(null);
+  final humidLowerStatus = ValueNotifier<bool?>(null);
+
   @override
   void initState() {
     super.initState();
@@ -46,54 +52,112 @@ class _SettingsPageState extends State<SettingsPage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: <Widget>[
-            TextField(
-              controller: _tempUpperController,
-              decoration: InputDecoration(
-                labelText: 'Enter upper bound for temperature',
-              ),
-            ),
-            TextField(
-              controller: _tempLowerController,
-              decoration: InputDecoration(
-                labelText: 'Enter lower bound for temperature',
-              ),
-            ),
-            TextField(
-              controller: _humidUpperController,
-              decoration: InputDecoration(
-                labelText: 'Enter upper bound for humidity',
-              ),
-            ),
-            TextField(
-              controller: _humidLowerController,
-              decoration: InputDecoration(
-                labelText: 'Enter lower bound for humidity',
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () async {
+            thresholdField(
+              _tempUpperController,
+              'Enter upper bound for temperature',
+              tempUpperStatus,
+              () async {
+                double tempUpper =
+                    double.tryParse(_tempUpperController.text) ?? 30.0;
+                double tempLower =
+                    double.tryParse(_tempLowerController.text) ?? 10.0;
                 await alarmService.setTemperatureBounds(
-                  upperBound:
-                      double.tryParse(_tempUpperController.text) ?? 30.0,
-                  lowerBound:
-                      double.tryParse(_tempLowerController.text) ?? 10.0,
-                );
-                await alarmService.setHumidityBounds(
-                  upperBound:
-                      double.tryParse(_humidUpperController.text) ?? 70.0,
-                  lowerBound:
-                      double.tryParse(_humidLowerController.text) ?? 20.0,
-                );
-                // Retrieve the current instance of MqttService and call updateBounds
+                    upperBound: tempUpper, lowerBound: tempLower);
                 final mqttService =
                     Provider.of<MqttService>(context, listen: false);
+                mqttService.publishThreshold(1, tempUpper);
                 await mqttService.updateBounds();
               },
-              child: Text('Save'),
+            ),
+            thresholdField(
+              _tempLowerController,
+              'Enter lower bound for temperature',
+              tempLowerStatus,
+              () async {
+                double tempUpper =
+                    double.tryParse(_tempUpperController.text) ?? 30.0;
+                double tempLower =
+                    double.tryParse(_tempLowerController.text) ?? 10.0;
+                await alarmService.setTemperatureBounds(
+                    upperBound: tempUpper, lowerBound: tempLower);
+                final mqttService =
+                    Provider.of<MqttService>(context, listen: false);
+                mqttService.publishThreshold(2, tempLower);
+                await mqttService.updateBounds();
+              },
+            ),
+            thresholdField(
+              _humidUpperController,
+              'Enter upper bound for humidity',
+              humidUpperStatus,
+              () async {
+                double humidUpper =
+                    double.tryParse(_humidUpperController.text) ?? 70.0;
+                double humidLower =
+                    double.tryParse(_humidLowerController.text) ?? 20.0;
+
+                await alarmService.setHumidityBounds(
+                  upperBound: humidUpper,
+                  lowerBound: humidLower,
+                );
+                final mqttService =
+                    Provider.of<MqttService>(context, listen: false);
+                mqttService.publishThreshold(3, humidUpper);
+                await mqttService.updateBounds();
+              },
+            ),
+            thresholdField(
+              _humidLowerController,
+              'Enter lower bound for humidity',
+              humidLowerStatus,
+              () async {
+                double humidUpper =
+                    double.tryParse(_humidUpperController.text) ?? 70.0;
+                double humidLower =
+                    double.tryParse(_humidLowerController.text) ?? 20.0;
+
+                await alarmService.setHumidityBounds(
+                  upperBound: humidUpper,
+                  lowerBound: humidLower,
+                );
+
+                final mqttService =
+                    Provider.of<MqttService>(context, listen: false);
+                mqttService.publishThreshold(4, humidLower);
+                await mqttService.updateBounds();
+              },
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget thresholdField(TextEditingController controller, String label,
+      ValueNotifier<bool?> status, Function onSave) {
+    return Row(
+      children: [
+        Expanded(
+          child: TextField(
+            controller: controller,
+            decoration: InputDecoration(
+              labelText: label,
+            ),
+          ),
+        ),
+        ValueListenableBuilder<bool?>(
+          valueListenable: status,
+          builder: (context, value, child) {
+            if (value == null) return Container(); // No icon if value is null
+            return Icon(value ? Icons.check : Icons.close,
+                color: value ? Colors.green : Colors.red);
+          },
+        ),
+        ElevatedButton(
+          onPressed: () => onSave(),
+          child: Text('Save'),
+        ),
+      ],
     );
   }
 }
