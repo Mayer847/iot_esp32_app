@@ -70,10 +70,17 @@ class MqttService with ChangeNotifier {
 
         print('Received message:$pt from topic: ${c?[0]?.topic ?? ''}>');
 
-        if (c?[0]?.topic == 'temp_esp32_791') {
-          temperature = double.tryParse(pt) ?? 0.0;
+        if (c?[0]?.topic == 'sensor_data_791') {
+          var data = pt.split(',');
+          var tempData = data[0].split('=')[1];
+          var humidData = data[1].split('=')[1];
+
+          temperature = double.tryParse(tempData) ?? 0.0;
+          humidity = double.tryParse(humidData) ?? 0.0;
+
           databaseService.insertData(
               temperature, humidity); // Insert data into the database
+
           if (temperatureUpperBound != null && temperatureLowerBound != null) {
             if (temperature > temperatureUpperBound!.value ||
                 temperature < temperatureLowerBound!.value) {
@@ -83,11 +90,7 @@ class MqttService with ChangeNotifier {
                   body: 'Temperature is now $temperature°C');
             }
           }
-          notifyListeners();
-        } else if (c?[0]?.topic == 'humid_esp32_791') {
-          humidity = double.tryParse(pt) ?? 0.0;
-          databaseService.insertData(
-              temperature, humidity); // Insert data into the database
+
           if (humidityUpperBound != null && humidityLowerBound != null) {
             if (humidity > humidityUpperBound!.value ||
                 humidity < humidityLowerBound!.value) {
@@ -96,6 +99,7 @@ class MqttService with ChangeNotifier {
                   title: 'Humidity Alert', body: 'Humidity is now $humidity%');
             }
           }
+
           notifyListeners();
         }
       });
@@ -112,11 +116,8 @@ class MqttService with ChangeNotifier {
   }
 
   void subscribeToNewTopics() {
-    String temperatureTopic = "temp_esp32_791";
-    String humidityTopic = "humid_esp32_791";
-
-    subscribe(temperatureTopic);
-    subscribe(humidityTopic);
+    String sensorDataTopic = "sensor_data_791";
+    subscribe(sensorDataTopic);
   }
 
   void publish(String topic, String message) {

@@ -26,7 +26,7 @@ class AlarmService with ChangeNotifier {
   Future<double> getHumidityLowerBound() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getDouble('humidityLowerBound') ??
-        30.0; // default value is 30.0
+        20.0; // default value is 20.0
   }
 
   Future<String> getTemperatureUpperBoundAsString() async {

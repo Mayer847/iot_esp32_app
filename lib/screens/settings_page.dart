@@ -82,7 +82,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   upperBound:
                       double.tryParse(_humidUpperController.text) ?? 70.0,
                   lowerBound:
-                      double.tryParse(_humidLowerController.text) ?? 30.0,
+                      double.tryParse(_humidLowerController.text) ?? 20.0,
                 );
                 // Retrieve the current instance of MqttService and call updateBounds
                 final mqttService =
