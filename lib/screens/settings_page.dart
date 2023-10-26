@@ -42,7 +42,7 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     final alarmService = Provider.of<AlarmService>(context);
-    final mqttService = Provider.of<MqttService>(context, listen: false);
+    // final mqttService = Provider.of<MqttService>(context, listen: false);
 
     return Scaffold(
       appBar: AppBar(
@@ -170,19 +170,18 @@ class _SettingsPageState extends State<SettingsPage> {
                 // if status is still null after 3 seconds, set it to false
                 status.value = false;
               }
-              // mqttService.unsubscribe(
-              //     "confirmation"); // unsubscribe from the topic after 3 seconds
+              mqttService.unsubscribe(
+                  "confirmation"); // unsubscribe from the topic after 3 seconds
             });
-            // StreamSubscription? subscription;
-            // subscription =
-            mqttService.updates.listen((message) {
+            StreamSubscription? subscription;
+            subscription = mqttService.updates.listen((message) {
               if (!mounted) return; // Check if the widget is still mounted
               if (message == "value changed!") {
                 status.value = true;
-                // subscription
-                //     ?.cancel(); // cancel the subscription after receiving the message
-                // mqttService.unsubscribe(
-                //     "confirmation"); // unsubscribe from the topic immediately after receiving the message
+                subscription
+                    ?.cancel(); // cancel the subscription after receiving the message
+                mqttService.unsubscribe(
+                    "confirmation"); // unsubscribe from the topic immediately after receiving the message
               }
             });
           },
