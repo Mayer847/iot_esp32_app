@@ -61,7 +61,7 @@ class MqttService with ChangeNotifier {
   Future<void> connect(String broker) async {
     print('Attempting to connect to $broker');
     client = MqttServerClient.withPort(broker, "mqtt_test", 1883);
-    client.keepAlivePeriod = 5;
+    client.keepAlivePeriod = 5 * 30; //keep the connection alive for 5 minutes
 
     client.onConnected = () {
       print('Connected');

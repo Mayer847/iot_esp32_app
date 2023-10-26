@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:iot_esp32_app/services/mqtt_service.dart';
 import 'package:iot_esp32_app/widgets/foreground_toggle.dart';
+import 'package:mqtt_client/mqtt_client.dart';
 import 'package:provider/provider.dart';
 import 'package:iot_esp32_app/services/alarm_service.dart';
 
@@ -164,24 +165,45 @@ class _SettingsPageState extends State<SettingsPage> {
             mqttService.subscribe("confirmation");
             status.value =
                 null; // reset the status while waiting for confirmation
+            bool isUnsubscribed = false; // add this flag
+
             Timer(Duration(seconds: 3), () {
-              if (!mounted) return; // Check if the widget is still mounted
-              if (status.value == null) {
-                // if status is still null after 3 seconds, set it to false
-                status.value = false;
+              try {
+                if (!mounted) return; // Check if the widget is still mounted
+                if (status.value == null) {
+                  // if status is still null after 3 seconds, set it to false
+                  status.value = false;
+                }
+                if (!isUnsubscribed &&
+                    mqttService.client.connectionStatus!.state ==
+                        MqttConnectionState.connected) {
+                  // only unsubscribe if not already done and client is connected
+                  // mqttService.unsubscribe("confirmation");
+                  isUnsubscribed = true;
+                }
+              } catch (e) {
+                print('Exception in timer callback: $e');
               }
-              mqttService.unsubscribe(
-                  "confirmation"); // unsubscribe from the topic after 3 seconds
             });
+
             StreamSubscription? subscription;
             subscription = mqttService.updates.listen((message) {
-              if (!mounted) return; // Check if the widget is still mounted
-              if (message == "value changed!") {
-                status.value = true;
-                subscription
-                    ?.cancel(); // cancel the subscription after receiving the message
-                mqttService.unsubscribe(
-                    "confirmation"); // unsubscribe from the topic immediately after receiving the message
+              try {
+                if (!mounted) return; // Check if the widget is still mounted
+                if (message == "value changed!") {
+                  status.value = true;
+                  subscription
+                      ?.cancel(); // cancel the subscription after receiving the message
+                  if (!isUnsubscribed &&
+                      mqttService.client.connectionStatus!.state ==
+                          MqttConnectionState.connected) {
+                    // only unsubscribe if not already done and client is connected
+                    mqttService.unsubscribe("confirmation");
+                    isUnsubscribed = true;
+                  }
+                }
+              } catch (e) {
+                print('Exception in updates listener: $e');
               }
             });
           },
