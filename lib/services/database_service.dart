@@ -81,7 +81,12 @@ CREATE TABLE $tableIotNotify (
     Sheet sheet = excel['SheetName'];
 
     // Create the header row
-    sheet.appendRow(["ID", "Time", "Temperature", "Humidity"]);
+    sheet.appendRow([
+      TextCellValue('ID'),
+      TextCellValue('Time'),
+      TextCellValue('Temperature'),
+      TextCellValue('Humidity')
+    ]);
 
     // Add the data rows
     for (var item in data) {

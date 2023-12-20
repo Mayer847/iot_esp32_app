@@ -157,10 +157,10 @@ packages:
     dependency: "direct main"
     description:
       name: excel
-      sha256: f6a76fff6ac14f48fd44a6528e72705965e02cbc593e00427ab1d9a9f5d3bffa
+      sha256: afa039babd69dd86f203c60fa1260df8c786f1e7e3666693e9cd12bddfcc974f
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.0"
+    version: "4.0.0"
   ffi:
     dependency: transitive
     description:
@@ -181,10 +181,10 @@ packages:
     dependency: "direct main"
     description:
       name: fl_chart
-      sha256: "6b9eb2b3017241d05c482c01f668dd05cc909ec9a0114fdd49acd958ff2432fa"
+      sha256: "5a74434cc83bf64346efb562f1a06eefaf1bcb530dc3d96a104f631a1eff8d79"
       url: "https://pub.dev"
     source: hosted
-    version: "0.64.0"
+    version: "0.65.0"
   flutter:
     dependency: "direct main"
     description: flutter
