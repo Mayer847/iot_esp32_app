@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:iot_esp32_app/services/mqtt_service.dart';
 import 'package:iot_esp32_app/widgets/foreground_toggle.dart';
@@ -56,81 +55,65 @@ class _SettingsPageState extends State<SettingsPage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: <Widget>[
-            thresholdField(
-              _tempUpperController,
-              'Enter upper bound for temperature',
-              tempUpperStatus,
-              () async {
-                double tempUpper =
-                    double.tryParse(_tempUpperController.text) ?? 30.0;
-                double tempLower =
-                    double.tryParse(_tempLowerController.text) ?? 10.0;
-                await alarmService.setTemperatureBounds(
-                    upperBound: tempUpper, lowerBound: tempLower);
-                final mqttService =
-                    Provider.of<MqttService>(context, listen: false);
-                mqttService.publishThreshold(1, tempUpper);
-                await mqttService.updateBounds();
-              },
-            ),
-            thresholdField(
-              _tempLowerController,
-              'Enter lower bound for temperature',
-              tempLowerStatus,
-              () async {
-                double tempUpper =
-                    double.tryParse(_tempUpperController.text) ?? 30.0;
-                double tempLower =
-                    double.tryParse(_tempLowerController.text) ?? 10.0;
-                await alarmService.setTemperatureBounds(
-                    upperBound: tempUpper, lowerBound: tempLower);
-                final mqttService =
-                    Provider.of<MqttService>(context, listen: false);
-                mqttService.publishThreshold(2, tempLower);
-                await mqttService.updateBounds();
-              },
-            ),
-            thresholdField(
-              _humidUpperController,
-              'Enter upper bound for humidity',
-              humidUpperStatus,
-              () async {
-                double humidUpper =
-                    double.tryParse(_humidUpperController.text) ?? 70.0;
-                double humidLower =
-                    double.tryParse(_humidLowerController.text) ?? 20.0;
+            thresholdField(_tempUpperController,
+                'Enter upper bound for temperature', tempUpperStatus, () async {
+              double tempUpper =
+                  double.tryParse(_tempUpperController.text) ?? 30.0;
+              double tempLower =
+                  double.tryParse(_tempLowerController.text) ?? 10.0;
+              await alarmService.setTemperatureBounds(
+                  upperBound: tempUpper, lowerBound: tempLower);
+              final mqttService =
+                  Provider.of<MqttService>(context, listen: false);
+              mqttService.publishThreshold(1, tempUpper);
+              await mqttService.updateBounds();
+            }, "temp_upper"),
+            thresholdField(_tempLowerController,
+                'Enter lower bound for temperature', tempLowerStatus, () async {
+              double tempUpper =
+                  double.tryParse(_tempUpperController.text) ?? 30.0;
+              double tempLower =
+                  double.tryParse(_tempLowerController.text) ?? 10.0;
+              await alarmService.setTemperatureBounds(
+                  upperBound: tempUpper, lowerBound: tempLower);
+              final mqttService =
+                  Provider.of<MqttService>(context, listen: false);
+              mqttService.publishThreshold(2, tempLower);
+              await mqttService.updateBounds();
+            }, "temp_lower"),
+            thresholdField(_humidUpperController,
+                'Enter upper bound for humidity', humidUpperStatus, () async {
+              double humidUpper =
+                  double.tryParse(_humidUpperController.text) ?? 70.0;
+              double humidLower =
+                  double.tryParse(_humidLowerController.text) ?? 20.0;
 
-                await alarmService.setHumidityBounds(
-                  upperBound: humidUpper,
-                  lowerBound: humidLower,
-                );
-                final mqttService =
-                    Provider.of<MqttService>(context, listen: false);
-                mqttService.publishThreshold(3, humidUpper);
-                await mqttService.updateBounds();
-              },
-            ),
-            thresholdField(
-              _humidLowerController,
-              'Enter lower bound for humidity',
-              humidLowerStatus,
-              () async {
-                double humidUpper =
-                    double.tryParse(_humidUpperController.text) ?? 70.0;
-                double humidLower =
-                    double.tryParse(_humidLowerController.text) ?? 20.0;
+              await alarmService.setHumidityBounds(
+                upperBound: humidUpper,
+                lowerBound: humidLower,
+              );
+              final mqttService =
+                  Provider.of<MqttService>(context, listen: false);
+              mqttService.publishThreshold(3, humidUpper);
+              await mqttService.updateBounds();
+            }, "humid_upper"),
+            thresholdField(_humidLowerController,
+                'Enter lower bound for humidity', humidLowerStatus, () async {
+              double humidUpper =
+                  double.tryParse(_humidUpperController.text) ?? 70.0;
+              double humidLower =
+                  double.tryParse(_humidLowerController.text) ?? 20.0;
 
-                await alarmService.setHumidityBounds(
-                  upperBound: humidUpper,
-                  lowerBound: humidLower,
-                );
+              await alarmService.setHumidityBounds(
+                upperBound: humidUpper,
+                lowerBound: humidLower,
+              );
 
-                final mqttService =
-                    Provider.of<MqttService>(context, listen: false);
-                mqttService.publishThreshold(4, humidLower);
-                await mqttService.updateBounds();
-              },
-            ),
+              final mqttService =
+                  Provider.of<MqttService>(context, listen: false);
+              mqttService.publishThreshold(4, humidLower);
+              await mqttService.updateBounds();
+            }, "humid_lower"),
           ],
         ),
       ),
@@ -138,7 +121,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget thresholdField(TextEditingController controller, String label,
-      ValueNotifier<bool?> status, Function onSave) {
+      ValueNotifier<bool?> status, Function onSave, String valueName) {
     return Row(
       children: [
         Expanded(
@@ -194,7 +177,7 @@ class _SettingsPageState extends State<SettingsPage> {
             subscription = mqttService.updates.listen((message) {
               try {
                 if (!mounted) return; // Check if the widget is still mounted
-                if (message == "value changed!") {
+                if (message == "$valueName changed!") {
                   status.value = true;
                   subscription
                       ?.cancel(); // cancel the subscription after receiving the message
